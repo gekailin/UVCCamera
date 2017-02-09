@@ -62,15 +62,3 @@ LOCAL_ARM_MODE := arm
 
 LOCAL_MODULE := libusb100_static
 include $(BUILD_STATIC_LIBRARY)
-
-######################################################################
-# libusb100.so
-######################################################################
-include $(CLEAR_VARS)
-LOCAL_MODULE_TAGS := optional
-LOCAL_EXPORT_LDLIBS += -llog
-
-LOCAL_WHOLE_STATIC_LIBRARIES = libusb100_static
-
-LOCAL_MODULE := libusb100
-include $(BUILD_SHARED_LIBRARY)
