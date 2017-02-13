@@ -49,6 +49,7 @@ import com.serenegiant.encoder.MediaVideoEncoder;
 import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
+import com.serenegiant.uvccamera.R;
 import com.serenegiant.widget.CameraViewInterface;
 
 import java.io.BufferedOutputStream;
