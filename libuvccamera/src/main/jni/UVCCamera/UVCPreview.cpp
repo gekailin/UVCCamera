@@ -46,6 +46,18 @@
 #define PREVIEW_PIXEL_BYTES 4	// RGBA/RGBX
 #define FRAME_POOL_SZ MAX_FRAME + 2
 
+pthread_mutex_t s_cv_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+typedef bool (*cv_cb_t)(int width, int height, size_t len, void *data);
+static cv_cb_t s_cv_cb = NULL;
+
+bool set_cv_cb(cv_cb_t cv_cb) {
+	pthread_mutex_lock(&s_cv_mutex);
+	s_cv_cb = cv_cb;
+	pthread_mutex_unlock(&s_cv_mutex);
+	return true;
+}
+
 UVCPreview::UVCPreview(uvc_device_handle_t *devh)
 :	mPreviewWindow(NULL),
 	mCaptureWindow(NULL),
@@ -647,6 +659,15 @@ uvc_frame_t *UVCPreview::draw_preview_one(uvc_frame_t *frame, ANativeWindow **wi
 					pthread_mutex_lock(&preview_mutex);
 					copyToSurface(converted, window);
 					pthread_mutex_unlock(&preview_mutex);
+					pthread_mutex_lock(&s_cv_mutex);
+					if (s_cv_cb != NULL) {
+						bool ret = s_cv_cb(converted->width, converted->height,
+								converted->data_bytes, converted->data);
+						if (!ret) {
+							s_cv_cb = NULL;
+						}
+					}
+					pthread_mutex_unlock(&s_cv_mutex);
 				} else {
 					LOGE("failed converting");
 				}
